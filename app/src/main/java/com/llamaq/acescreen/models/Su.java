@@ -28,7 +28,7 @@ public class Su {
 
     private volatile static Su sInstance;
     private final MutableLiveData<Boolean> mGranted = new MutableLiveData<>();
-    private Boolean mRootFeature;
+    private Boolean mFeaturePresent;
 
     public static Su getInstance() {
         if (sInstance == null) {
@@ -55,8 +55,8 @@ public class Su {
      * Getter for guessed value
      * @return true if rooted, false if not.
      */
-    public boolean hasRootFeature() {
-        return Boolean.TRUE.equals(mRootFeature);
+    public boolean isFeaturePresent() {
+        return Boolean.TRUE.equals(mFeaturePresent);
     }
 
     /**
@@ -64,8 +64,8 @@ public class Su {
      */
     public void guess() {
         AsyncTask.execute(() -> {
-            mRootFeature = (Shell.runAsUser(CMD_GUESS_ROOT_PRESENT)).getExitStatus();
-            Timber.d("Device is rooted: %s", mRootFeature);
+            mFeaturePresent = (Shell.runAsUser(CMD_GUESS_ROOT_PRESENT)).getExitStatus();
+            Timber.d("Device is rooted: %s", mFeaturePresent);
         });
     }
 
@@ -91,9 +91,14 @@ public class Su {
 
     /**
      * Immediately turns off display.
+     * @param screenTimeoutEnforced Should we ignore other apps WAKE_LOCKs or not
      * @return Whether the action was successfully performed.
      */
-    public boolean lockNow() {
+    public boolean lockNow(boolean screenTimeoutEnforced) {
+        if (!screenTimeoutEnforced && isWakeLockedByOtherApps()) {
+            return false;
+        }
+
         ShellResult shellResult = runAsRoot(CMD_PRESS_POWER_BUTTON);
         boolean exitStatus = shellResult.getExitStatus();
         Timber.d("CMD_PRESS_POWER_BUTTON succeeded? %s", exitStatus);
