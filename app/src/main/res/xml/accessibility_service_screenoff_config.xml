@@ -1,0 +1,12 @@
+<!-- We really want to limit our Accessibility Service as much as possible
+    as we don't need any data through the Accessibility Service API. -->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/timeout_method_accessibility_info"
+    android:packageNames="com.llamaq.acescreen"
+    android:accessibilityEventTypes="typeAnnouncement"
+    android:accessibilityFlags="flagDefault"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:notificationTimeout="100"
+    android:canRetrieveWindowContent="false"
+    android:settingsActivity="com.llamaq.acescreen.activities.MainActivity"
+    />
