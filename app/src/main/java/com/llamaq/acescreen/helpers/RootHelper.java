@@ -52,19 +52,18 @@ public class RootHelper {
         return Boolean.TRUE.equals(deviceRooted);
     }
 
+    /**
+     * Immediately turns off display.
+     * @return Whether the action was successfully performed.
+     */
     public static boolean lockNow() {
-        if (isWakeLockedByOtherApps() && ! Prefs.isScreenTimeoutEnforced()) {
-            Timber.d("WakeLocked by Other Apps and Screen Off is not Enforced.");
-            return false;
-        }
-
         ShellResult shellResult = RootHelper.runAsRoot(CMD_PRESS_POWER_BUTTON);
         boolean exitStatus = shellResult.getExitStatus();
         Timber.d("CMD_PRESS_POWER_BUTTON succeeded? %s", exitStatus);
         return exitStatus;
     }
 
-    private static boolean isWakeLockedByOtherApps() {
+    public static boolean isWakeLockedByOtherApps() {
         ShellResult shellResult = RootHelper.runAsRoot(CMD_DUMPSYS_POWER);
         if (! shellResult.getExitStatus()) {
             // let's assume that there are wakelocks if `dumpsys power` fails for some reason
