@@ -1,4 +1,4 @@
-package com.llamaq.acescreen.helpers;
+package com.llamaq.acescreen.helpers.shell;
 
 import androidx.annotation.NonNull;
 

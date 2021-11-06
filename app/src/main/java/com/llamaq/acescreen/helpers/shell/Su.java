@@ -1,4 +1,4 @@
-package com.llamaq.acescreen.models;
+package com.llamaq.acescreen.helpers.shell;
 
 import static com.llamaq.acescreen.helpers.Bubble.showBubble;
 
@@ -10,8 +10,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.llamaq.acescreen.App;
 import com.llamaq.acescreen.R;
 import com.llamaq.acescreen.helpers.Prefs;
-import com.llamaq.acescreen.helpers.Shell;
-import com.llamaq.acescreen.helpers.ShellResult;
 
 import timber.log.Timber;
 
@@ -20,11 +18,23 @@ import timber.log.Timber;
  */
 
 public class Su {
-    private static final String CMD_GUESS_ROOT_PRESENT = "which su"; // `command -v` is unavailable
-    private static final String CMD_DUMPSYS_POWER = "dumpsys power";
-    private static final String CMD_PRESS_POWER_BUTTON = "input keyevent 26";
     private static final String PERMISSION_ROOT_GRANTED_KEY =
             App.get().getString(R.string.permission_root_granted_key);
+
+    private static final String CMD_GUESS_ROOT_PRESENT =
+            "which su"; // `command -v` is unavailable
+    private static final String CMD_DUMPSYS_POWER =
+            "dumpsys power";
+    private static final String CMD_PRESS_POWER_BUTTON =
+            "input keyevent 26";
+
+    /**
+     * Command to ensure min timeout to support wake locks by other apps as if device is wake locked
+     * and the user wants us to respect wake locks by other apps, we temporarily delegate screen off
+     * to the system to save power (as this situation can potentially last for hours).
+     */
+    private static final String CMD_SCREEN_OFF_TIMEOUT =
+            "settings put system screen_off_timeout 15000";
 
     private volatile static Su sInstance;
     private final MutableLiveData<Boolean> mGranted = new MutableLiveData<>();
@@ -95,8 +105,11 @@ public class Su {
      * @return Whether the action was successfully performed.
      */
     public boolean lockNow(boolean screenTimeoutEnforced) {
-        if (!screenTimeoutEnforced && isWakeLockedByOtherApps()) {
-            return false;
+        if (!screenTimeoutEnforced) {
+            if (isWakeLockedByOtherApps()) {
+                runAsRoot(CMD_SCREEN_OFF_TIMEOUT);
+                return false;
+            }
         }
 
         ShellResult shellResult = runAsRoot(CMD_PRESS_POWER_BUTTON);
