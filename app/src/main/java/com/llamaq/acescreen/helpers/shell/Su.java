@@ -1,6 +1,7 @@
 package com.llamaq.acescreen.helpers.shell;
 
 import static com.llamaq.acescreen.helpers.Bubble.showBubble;
+import static com.llamaq.acescreen.helpers.ScreenTimeout.MIN_USER_SCREEN_TIMEOUT_MILLIS;
 
 import android.os.AsyncTask;
 
@@ -10,6 +11,9 @@ import androidx.lifecycle.MutableLiveData;
 import com.llamaq.acescreen.App;
 import com.llamaq.acescreen.R;
 import com.llamaq.acescreen.helpers.Prefs;
+import com.llamaq.acescreen.helpers.ScreenTimeout;
+
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -33,8 +37,8 @@ public class Su {
      * and the user wants us to respect wake locks by other apps, we temporarily delegate screen off
      * to the system to save power (as this situation can potentially last for hours).
      */
-    private static final String CMD_SCREEN_OFF_TIMEOUT =
-            "settings put system screen_off_timeout 15000";
+    private static final String CMD_SCREEN_OFF_TIMEOUT = String.format(Locale.US,
+            "settings put system screen_off_timeout %d", MIN_USER_SCREEN_TIMEOUT_MILLIS);
 
     private volatile static Su sInstance;
     private final MutableLiveData<Boolean> mGranted = new MutableLiveData<>();
@@ -107,7 +111,9 @@ public class Su {
     public boolean lockNow(boolean screenTimeoutEnforced) {
         if (!screenTimeoutEnforced) {
             if (isWakeLockedByOtherApps()) {
-                runAsRoot(CMD_SCREEN_OFF_TIMEOUT);
+                if (ScreenTimeout.getSystemTimeout() > MIN_USER_SCREEN_TIMEOUT_MILLIS) {
+                    runAsRoot(CMD_SCREEN_OFF_TIMEOUT);
+                }
                 return false;
             }
         }
@@ -118,7 +124,7 @@ public class Su {
         return exitStatus;
     }
 
-    public boolean isWakeLockedByOtherApps() {
+    private boolean isWakeLockedByOtherApps() {
         ShellResult shellResult = runAsRoot(CMD_DUMPSYS_POWER);
         if (! shellResult.getExitStatus()) {
             // let's assume that there are wakelocks if `dumpsys power` fails for some reason
