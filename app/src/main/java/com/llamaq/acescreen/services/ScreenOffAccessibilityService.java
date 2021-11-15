@@ -48,7 +48,6 @@ public class ScreenOffAccessibilityService extends AccessibilityService {
         return sInstance != null;
     }
 
-
     /**
      * Immediately turns off display.
      * @return Whether the action was successfully performed.
