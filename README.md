@@ -10,6 +10,8 @@ At the moment, the following application components are publicly available:
 - **Root Access.** This method actively and reliably turns off the screen. This method does not interfere with biometric unlocking (such as smart lock or fingerprint unlock). And this is the only method that allows you to choose what to do if some app or game prevents the screen from turning off.
 - Some minor helper classes and modules.
 
+The main idea is to isolate the program code with elevated privileges from other parts of the application as much as possible. It uses an OOP principle known as encapsulation. Thus, we only allow interaction with security-critical capabilities through predefined and extremely limited **public** methods, each of which should perform a narrow and specific task. Due to encapsulation, other parts of the application do not have access to **private** methods, which greatly reduces the possibility of executing unexpected elevated code by mistake.
+
 If you have any ideas or feedback, feel free to open an issue and contribute.
 
 Learn more about AceScreen on the product website: https://www.acescreen.app
