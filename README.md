@@ -2,6 +2,15 @@
 
 AceScreen is an app that prevents the Android device from going to sleep based on the current needs of the user. It offers two modes of operation which allow the app to adapt to almost any situation in everyday life. In automatic mode, AceScreen uses sensors and other available information to get the job done. Sometimes you may want the screen not to turn off under any circumstances. For such cases, manual mode is the right thing.
 
+<img src="screenshots/mobile-1.png" alt="App main screen with active automatic mode" width="200" />
+<img src="screenshots/mobile-2.png" alt="The device is charging or docked" width="200" />
+<img src="screenshots/mobile-3.png" alt="The device is in your pocket or backpack" width="200" />
+<img src="screenshots/mobile-4.png" alt="App main screen with active manual mode" width="200" />
+<img src="screenshots/mobile-5.png" alt="App settings screen" width="200" />
+<img src="screenshots/mobile-6.png" alt="Persistent notification" width="200" />
+<img src="screenshots/mobile-7.png" alt="App main screen when night mode is on" width="200" />
+<img src="screenshots/mobile-8.png" alt="About the App" width="200" />
+
 Our team has been contributing to the world of open source software for quite some time now. And we made the decision to publish some of the most security-critical parts of our application source code. This will allow anyone who wants to study the source code, express their thoughts, and, if desired, contribute to it.
 
 At the moment, the following application components are publicly available:
