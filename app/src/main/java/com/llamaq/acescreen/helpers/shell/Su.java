@@ -170,6 +170,7 @@ public class Su {
         }
 
         String s = shellResult.getStdout().toString();
+        if (s.isEmpty()) return "";
         if (mForegroundAppPattern == null) return "";
         Matcher matcher = mForegroundAppPattern.matcher(s);
         if (!matcher.find()) return "";
