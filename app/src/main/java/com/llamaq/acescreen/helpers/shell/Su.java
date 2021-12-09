@@ -14,6 +14,8 @@ import com.llamaq.acescreen.helpers.Prefs;
 import com.llamaq.acescreen.helpers.ScreenTimeout;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import timber.log.Timber;
 
@@ -29,6 +31,8 @@ public class Su {
             "which su"; // `command -v` is unavailable
     private static final String CMD_DUMPSYS_POWER =
             "dumpsys power";
+    private static final String CMD_DUMPSYS_ACTIVITY =
+            "dumpsys activity";
     private static final String CMD_PRESS_POWER_BUTTON =
             "input keyevent 26";
 
@@ -43,6 +47,7 @@ public class Su {
     private volatile static Su sInstance;
     private final MutableLiveData<Boolean> mGranted = new MutableLiveData<>();
     private Boolean mFeaturePresent;
+    private Pattern mForegroundAppPattern;
 
     public static Su getInstance() {
         if (sInstance == null) {
@@ -57,6 +62,13 @@ public class Su {
 
     private Su() {
         mGranted.postValue(isGranted());
+
+        try {
+            mForegroundAppPattern = Pattern.compile("\\s+\\d+:([\\w.]+)/u\\d+a\\d+\\s+activity=activities");
+        } catch (Exception e) {
+            Timber.d(e);
+        }
+
     }
 
     public boolean isGranted() {
@@ -149,6 +161,30 @@ public class Su {
         ShellResult shellResult = Shell.run("su", cmd);
         setGranted(shellResult.getExitStatus());
         return shellResult;
+    }
+
+    public String getForegroundApp() {
+        ShellResult shellResult = runAsRoot(CMD_DUMPSYS_ACTIVITY);
+        if (! shellResult.getExitStatus()) {
+            return "";
+        }
+
+        String s = shellResult.getStdout().toString();
+        if (mForegroundAppPattern == null) return "";
+        Matcher matcher = mForegroundAppPattern.matcher(s);
+        if (!matcher.find()) return "";
+
+        //noinspection UnusedAssignment
+        String packageName = "";
+        try {
+            packageName = matcher.group(1);
+        } catch (Exception e) {
+            Timber.d(e);
+            return "";
+        }
+
+        Timber.d("ForegroundApp (root method): %s", packageName);
+        return packageName;
     }
 
 //    public boolean hasRootAccess() {
