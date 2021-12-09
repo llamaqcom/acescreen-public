@@ -10,6 +10,7 @@ At the moment, the following application components are publicly available:
 
 - **Accessibility Service.** Accessibility Service access is the only way on most devices to effectively turn off the screen and not interfere with biometric unlocking (such as fingerprint unlock or smart lock). AceScreen uses the Accessibility Service for this feature to work.
 - **Root Access.** This method actively and reliably turns off the screen. This method does not interfere with biometric unlocking (such as smart lock or fingerprint unlock). And this is the only method that allows you to choose what to do if some app or game prevents the screen from turning off.
+- **UsageStatsManager.** The `ForegroundApp` class that is used to find the app that is currently in the foreground.
 - Some minor helper classes and modules.
 
 The main idea is to isolate the program code with elevated privileges from other parts of the application as much as possible. It uses an OOP principle known as encapsulation. Thus, we only allow interaction with security-critical capabilities through predefined and extremely limited **public** methods, each of which should perform a narrow and specific task. Due to encapsulation, other parts of the application do not have access to **private** methods, which greatly reduces the possibility of executing unexpected elevated code by mistake.
