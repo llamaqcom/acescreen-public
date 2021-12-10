@@ -1,14 +1,11 @@
 package com.llamaq.acescreen.helpers;
 
-import static com.llamaq.acescreen.helpers.Bubble.showBubble;
-
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.os.AsyncTask;
 
 import com.llamaq.acescreen.BuildConfig;
-import com.llamaq.acescreen.R;
 import com.llamaq.acescreen.helpers.shell.Su;
 
 import java.util.List;
@@ -17,13 +14,24 @@ import timber.log.Timber;
 
 public class ForegroundApp {
     private static String sForegroundApp = "";
+    private static long sRateLimiter = 0;
 
     public static void detectForegroundApp(final Context context) {
-        if (Perms.isUsageAccessGranted()) {
-            detectForegroundAppUsageStats(context);
-        } else if (Su.getInstance().isGranted()) {
-            AsyncTask.execute(() -> sForegroundApp = Su.getInstance().getForegroundApp());
-        }
+        if (! Prefs.isAwakeApps()) return;
+
+        long minInterval = (long) (ScreenTimeout.getIdleTimeoutMillis() * 0.8f);
+        if (System.currentTimeMillis() - sRateLimiter < minInterval) return;
+        sRateLimiter = System.currentTimeMillis();
+
+        AsyncTask.execute(() -> {
+            long start = System.currentTimeMillis();
+            if (Perms.isUsageAccessGranted()) {
+                detectForegroundAppUsageStats(context);
+            } else if (Su.getInstance().isGranted()) {
+                sForegroundApp = Su.getInstance().getForegroundApp();
+            }
+            Timber.d("Duration %s millis", System.currentTimeMillis() - start);
+        });
     }
 
     private static void detectForegroundAppUsageStats(final Context context)
