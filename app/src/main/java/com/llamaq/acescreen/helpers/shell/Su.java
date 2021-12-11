@@ -169,10 +169,17 @@ public class Su {
             return "";
         }
 
-        String s = shellResult.getStdout().toString();
-        if (s.isEmpty()) return "";
+        String output = "";
+        for (String s : shellResult.getStdout()) {
+            if (s.contains("activity=activities")) {
+                output = s;
+                break;
+            }
+        }
+
+        if (output.isEmpty()) return "";
         if (mForegroundAppPattern == null) return "";
-        Matcher matcher = mForegroundAppPattern.matcher(s);
+        Matcher matcher = mForegroundAppPattern.matcher(output);
         if (!matcher.find()) return "";
 
         //noinspection UnusedAssignment
